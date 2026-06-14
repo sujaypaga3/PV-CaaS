@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PromoVeritas — Compliance Stress-Test</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif}
+html,body{height:100%;overflow:hidden}
+.app{display:flex;height:100vh;overflow:hidden}
+.sb{width:230px;flex-shrink:0;background:linear-gradient(160deg,#0D0118,#130320 50%,#1A0533);display:flex;flex-direction:column;overflow:hidden}
+.sb-head{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:10px;cursor:pointer;background:none;border-top:none;border-left:none;border-right:none;width:100%}
+.sb-head svg{width:20px;height:20px;stroke:white;fill:none;flex-shrink:0}
+.sb-logo-t{font-size:13px;font-weight:800;color:white}
+.sb-logo-s{font-size:8px;font-weight:700;color:rgba(139,92,246,.8);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.sb-nav{flex:1;padding:14px 10px;overflow-y:auto}
+.grp-lbl{font-size:8px;font-weight:700;color:rgba(255,255,255,.2);text-transform:uppercase;letter-spacing:2px;padding:8px 8px 4px;display:flex;align-items:center;gap:6px}
+.grp-lbl::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.06)}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:9px;cursor:pointer;background:none;border:none;text-align:left;width:100%;margin-bottom:1px}
+.ni:hover{background:rgba(255,255,255,.06)}
+.ni.active{background:rgba(139,92,246,.18);border:1px solid rgba(139,92,246,.3)}
+.ni.done .nn{background:rgba(139,92,246,.4);border-color:transparent}
+.nn{width:22px;height:22px;border-radius:50%;border:1.5px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ni.active .nn{background:#7C3ABE;border-color:#7C3ABE;box-shadow:0 0 12px rgba(124,58,190,.5)}
+.nn-n{font-size:9px;font-weight:700;color:rgba(255,255,255,.3)}
+.nn-ck{display:none;width:10px;height:10px;stroke:white;fill:none;stroke-width:2.5}
+.ni.done .nn-ck{display:block}
+.ni.done .nn-n{display:none}
+.nl{font-size:11px;font-weight:600;color:rgba(255,255,255,.35)}
+.ns{font-size:9px;color:rgba(255,255,255,.18);margin-top:1px}
+.ni.active .nl{color:white;font-weight:700}
+.ni.active .ns{color:rgba(192,132,252,.6)}
+.ni.done .nl{color:rgba(255,255,255,.5)}
+.sb-foot{padding:12px 10px;border-top:1px solid rgba(255,255,255,.07)}
+.u-btn{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:9px;cursor:pointer;background:none;border:none;width:100%}
+.u-btn:hover{background:rgba(255,255,255,.05)}
+.u-av{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#5B1D82,#7C3ABE);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:white;flex-shrink:0}
+.u-name{font-size:11px;font-weight:700;color:white;line-height:1.2}
+.u-role{font-size:9px;color:rgba(255,255,255,.3);line-height:1.2}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;background:#fff}
+.prog{height:3px;background:rgba(91,29,130,.15);flex-shrink:0}
+.prog-fill{height:100%;background:linear-gradient(90deg,#5B1D82,#C084FC);transition:width .5s ease;width:0%}
+.screens{flex:1;position:relative;overflow:hidden}
+.scr{display:none;flex-direction:column;height:100%;overflow:hidden}
+.scr.active{display:flex}
+.sh{background:linear-gradient(135deg,#0D0118,#1A0533 50%,#2D0A52);flex-shrink:0;display:grid;grid-template-columns:1fr 105px;border-left:3px solid rgba(139,92,246,.5)}
+.sh-alt{background:linear-gradient(135deg,#0A011A,#1A0533 50%,#2D0A52)}
+.sh-green{background:linear-gradient(140deg,#052e16,#166534)}
+.sh-in{padding:22px 26px 18px}
+.sh-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.35);border-radius:20px;padding:3px 10px;font-size:9px;font-weight:700;color:rgba(255,255,255,.8);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px}
+.sh-dot{width:5px;height:5px;border-radius:50%;background:#C084FC}
+.sh-tag{font-size:8px;font-weight:700;color:rgba(139,92,246,.9);background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.25);padding:1px 6px;border-radius:4px;margin-left:4px;text-transform:none;letter-spacing:0;display:none}
+.sh-h1{font-size:clamp(1.3rem,2.8vw,2rem);font-weight:800;color:white;line-height:1.1;letter-spacing:-.03em;margin-bottom:5px}
+.sh-h1 em{font-style:italic;font-weight:300;color:rgba(255,255,255,.45)}
+.sh-p{font-size:12px;color:rgba(255,255,255,.55);line-height:1.65;max-width:420px}
+.sh-stats{background:rgba(0,0,0,.3);border-left:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:7px;padding:16px 10px}
+.sh-sv{font-size:1.2rem;font-weight:800;display:block;line-height:1;background:linear-gradient(135deg,#C084FC,#8B5CF6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sh-sl{font-size:7px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1px;margin-top:1px;display:block}
+.sh-sep{width:20px;height:1px;background:rgba(255,255,255,.1)}
+.bd{flex:1;overflow-y:auto;background:#fff;padding:22px 26px 90px}
+.lbl{font-size:9px;font-weight:700;color:#5B1D82;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.lbl::after{content:'';flex:1;height:1px;background:#EDE4F7}
+.div-row{display:flex;align-items:center;gap:10px;margin:16px 0}
+.div-line{flex:1;height:1px;background:#EDE4F7}
+.div-lbl{font-size:9px;font-weight:700;color:rgba(139,92,246,.5);text-transform:uppercase;letter-spacing:1.5px;white-space:nowrap}
+.inp{width:100%;border:2px solid #D8B4FE;border-radius:10px;padding:11px 14px;font-size:13px;color:#1A0533;outline:none;transition:border-color .2s,box-shadow .2s;font-family:inherit;background:#fff}
+.inp:focus{border-color:#7C3ABE;box-shadow:0 0 0 4px rgba(91,29,130,.08)}
+.inp::placeholder{color:#A090B8}
+textarea.inp{resize:vertical;min-height:110px;line-height:1.65}
+.chip{background:#fff;border:1.5px solid #D8B4FE;border-radius:20px;padding:5px 12px;font-size:11px;font-weight:600;color:#7C6A92;cursor:pointer;transition:all .18s;font-family:inherit}
+.chip:hover,.chip.used{border-color:#5B1D82;background:#F9F5FF;color:#5B1D82}
+.og{display:grid;gap:10px;margin-bottom:16px}
+.og.c2{grid-template-columns:1fr 1fr}
+.og.c3{grid-template-columns:1fr 1fr 1fr}
+.og.ca{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+.oc{background:#fff;border:1.5px solid #E9D5FF;border-left:3px solid #7C3ABE;border-radius:0 12px 12px 0;padding:14px;text-align:left;transition:all .2s;position:relative;cursor:pointer;font-family:inherit}
+.oc:hover{border-color:#7C3ABE;border-left-color:#5B1D82;transform:translateY(-2px);box-shadow:0 6px 16px rgba(91,29,130,.1)}
+.oc.sel{border-color:#5B1D82;border-left-color:#5B1D82;border-left-width:4px;background:#FAF5FF}
+.oc.pri{border-color:#D97706!important;background:#FFFBEB!important}
+.oc-i{width:30px;height:30px;background:#F9F5FF;border:1px solid #EDE4F7;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.oc-i svg{width:14px;height:14px;stroke:#5B1D82;fill:none;stroke-width:1.5}
+.oc.sel .oc-i{background:#EDE4F7}
+.oc-l{font-size:12px;font-weight:700;color:#1A0533;margin-bottom:2px}
+.oc-s{font-size:11px;color:#7C6A92;line-height:1.4}
+.oc-ck{position:absolute;top:10px;right:10px;width:17px;height:17px;border-radius:50%;background:#5B1D82;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(.4);transition:all .2s}
+.oc.sel .oc-ck,.oc.pri .oc-ck{opacity:1;transform:scale(1)}
+.oc-t{position:absolute;top:8px;left:8px;font-size:8px;font-weight:800;padding:1px 5px;border-radius:4px;opacity:0}
+.oc.sel .oc-t{opacity:1;background:#EDE4F7;color:#7C3ABE}
+.oc.pri .oc-t{opacity:1;background:#FEF9C3;color:#92400E}
+.mr{background:#fff;border:2px solid #E9D5FF;border-radius:11px;padding:12px 14px;margin-bottom:9px}
+.mr-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.mr-l{font-size:12px;font-weight:700;color:#1A0533}
+.mr-a{font-size:10px;font-weight:600;color:#5B1D82;background:#F9F5FF;border:1px solid #EDE4F7;border-radius:6px;padding:3px 9px;cursor:pointer;font-family:inherit;transition:all .18s}
+.mr-a:hover{background:#5B1D82;color:#fff}
+.mg{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:6px}
+.mc{background:#fff;border:1.5px solid #E9D5FF;border-radius:8px;padding:6px 8px;font-size:11px;font-weight:600;color:#4A3560;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:4px;font-family:inherit}
+.mc:hover{border-color:#7C3ABE;transform:translateY(-1px)}
+.mc.on{background:#5B1D82;color:#fff;border-color:#5B1D82;box-shadow:0 4px 12px rgba(91,29,130,.25)}
+.dial-w{display:grid;grid-template-columns:88px 1fr;gap:12px;align-items:center;background:#fff;border:2px solid #E9D5FF;border-radius:11px;padding:12px;margin-bottom:14px}
+.rcg{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:20px}
+.rcc{background:#fff;border:2px solid #E9D5FF;border-radius:11px;padding:12px;cursor:pointer;transition:all .2s}
+.rcc:hover{border-color:#5B1D82;transform:translateY(-2px);box-shadow:0 6px 16px rgba(91,29,130,.1)}
+.rc-dot{width:7px;height:7px;border-radius:50%;margin-bottom:6px}
+.rc-n{font-size:11px;font-weight:700;color:#1A0533;margin-bottom:2px}
+.rc-m{font-size:9px;color:#7C6A92;margin-bottom:5px}
+.rc-s{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:#EDE4F7;color:#5B1D82;display:inline-block}
+.rc-s.live{background:#DCFCE7;color:#166534}
+.mcl{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.mcard{background:#fff;border:2px solid #E9D5FF;border-radius:13px;overflow:hidden;border-left-width:4px}
+.mcard.open{border-color:#5B1D82}
+.mcard.rbl{border-left-color:#16a34a}.mcard.rbm{border-left-color:#d97706}.mcard.rbh{border-left-color:#dc2626}
+.mcard.rbl .mico{background:#DCFCE7;border-color:#86EFAC}.mcard.rbl .mico svg{stroke:#16a34a}
+.mcard.rbm .mico{background:#FEF3C7;border-color:#FCD34D}.mcard.rbm .mico svg{stroke:#d97706}
+.mcard.rbh .mico{background:#FEE2E2;border-color:#FCA5A5}.mcard.rbh .mico svg{stroke:#dc2626}
+.mcard.open.rbl{border-color:#16a34a}.mcard.open.rbm{border-color:#d97706}.mcard.open.rbh{border-color:#dc2626}
+.mcard-top{padding:13px 15px;display:flex;align-items:center;gap:11px;cursor:pointer;user-select:none}
+.mico{width:38px;height:38px;border-radius:10px;background:#F9F5FF;border:1px solid #EDE4F7;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mico svg{width:17px;height:17px;stroke:#5B1D82;fill:none;stroke-width:1.5}
+.mini{flex:1;min-width:0}
+.mna{font-size:13px;font-weight:800;color:#1A0533;margin-bottom:2px}
+.mde{font-size:11px;color:#7C6A92;line-height:1.4}
+.mri{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.mrisk{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap}
+.rl{background:#DCFCE7;color:#14532D;border:1px solid #86EFAC}
+.rm{background:#FEF3C7;color:#78350F;border:1px solid #FCD34D}
+.rh{background:#FEE2E2;color:#7F1D1D;border:1px solid #FCA5A5}
+.mdis{font-size:10px;color:#A090B8;background:none;border:1px solid #EDE4F7;border-radius:5px;padding:2px 6px;cursor:pointer;font-family:inherit}
+.mdis:hover{background:#FEE2E2;color:#991B1B}
+.mchev{width:22px;height:22px;border-radius:6px;background:#F9F5FF;display:flex;align-items:center;justify-content:center}
+.mchev svg{width:11px;height:11px;stroke:#7C6A92;transition:transform .25s}
+.mcard.open .mchev svg{transform:rotate(180deg)}
+.mcard-body{display:none;padding:0 15px 15px;border-top:1px solid #EDE4F7}
+.mcard.open .mcard-body{display:block}
+.rg{margin-bottom:5px;border:1px solid #EDE4F7;border-radius:8px;overflow:hidden}
+.rg-h{padding:7px 10px;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+.rg-h.ok{background:#f0fdf4}.rg-h.wa{background:#fefce8}.rg-h.hi{background:#fef2f2}
+.rg-d{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.rg-t{font-size:10px;font-weight:700;flex:1}
+.rg-t.ok{color:#14532D}.rg-t.wa{color:#78350F}.rg-t.hi{color:#7F1D1D}
+.rg-bs{display:flex;gap:3px;flex-wrap:wrap}
+.rg-b{font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px}
+.rg-b.ok{background:#dcfce7;color:#14532D}.rg-b.wa{background:#fef3c7;color:#78350F}.rg-b.hi{background:#fee2e2;color:#7F1D1D}
+.rg-cv{font-size:9px;color:#A090B8;transition:transform .2s;flex-shrink:0}
+.rg.open .rg-cv{transform:rotate(180deg)}
+.rg-body{display:none;padding:7px 10px 9px;border-top:1px solid #EDE4F7;background:#fff}
+.rg.open .rg-body{display:block}
+.rg-item{display:flex;gap:6px;font-size:11px;color:#4A3560;padding:3px 0;border-bottom:1px solid #EDE4F7;line-height:1.55}
+.rg-item:last-child{border-bottom:none}
+.rg-id{width:3px;height:3px;border-radius:50%;flex-shrink:0;margin-top:7px}
+.rg-id.ok{background:#16a34a}.rg-id.wa{background:#d97706}.rg-id.hi{background:#dc2626}
+.mnote{font-size:10px;color:#7C6A92;background:#F9F5FF;border-radius:7px;padding:8px 11px;line-height:1.55;border:1px solid #EDE4F7;margin-top:10px;font-style:italic}
+.ttc{background:#fff;border:2px solid #EDE4F7;border-left:4px solid #5B1D82;border-radius:0 11px 11px 0;padding:12px;margin-bottom:12px}
+.ttc-h{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.ttc-i{width:22px;height:22px;background:#F9F5FF;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.ttc-i svg{width:11px;height:11px;stroke:#5B1D82;fill:none}
+.ttc-t{font-size:12px;font-weight:800;color:#1A0533}
+.ttc-item{display:flex;gap:7px;padding:6px 0;border-bottom:1px solid #EDE4F7;font-size:11px;color:#4A3560;line-height:1.55}
+.ttc-item:last-child{border-bottom:none}
+.ttc-dot{width:4px;height:4px;border-radius:50%;background:#5B1D82;flex-shrink:0;margin-top:6px}
+.bh{background:linear-gradient(140deg,#0D0118,#1A0533 55%,#3D0F5A);border-radius:13px;padding:1.4rem;margin-bottom:13px}
+.bh-l{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px}
+.bh-t{font-size:clamp(1.1rem,2vw,1.6rem);font-weight:800;color:#fff;line-height:1.1;letter-spacing:-.03em;margin-bottom:11px}
+.bh-s{display:flex;gap:18px;flex-wrap:wrap}
+.bsv{font-size:1.4rem;font-weight:800;color:#fff;line-height:1}
+.bsl{font-size:8px;color:rgba(255,255,255,.35);margin-top:2px;text-transform:uppercase;letter-spacing:1px}
+.bg2{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:9px}
+.bc{background:#fff;border:2px solid #EDE4F7;border-radius:9px;padding:11px}
+.bcl{font-size:9px;font-weight:700;color:#A090B8;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px}
+.bcv{font-size:12px;color:#4A3560;line-height:1.5}
+.bsec{background:#fff;border:2px solid #EDE4F7;border-radius:11px;padding:13px;margin-bottom:9px}
+.bsecl{font-size:9px;font-weight:700;color:#A090B8;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:7px}
+.rgg{background:#fff;border:2px solid #EDE4F7;border-radius:11px;padding:13px;display:flex;align-items:center;gap:12px;margin-bottom:9px}
+.dh{background:linear-gradient(140deg,#052e16,#166534);border-radius:13px;padding:1.4rem;margin-bottom:13px}
+.dg{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:11px}
+.dc{background:#fff;border:2px solid #EDE4F7;border-radius:10px;padding:13px;text-align:center}
+.dv{font-size:1.7rem;font-weight:800;color:#1A0533;line-height:1}
+.dl{font-size:10px;color:#7C6A92;margin-top:3px}
+.dsec{background:#fff;border:2px solid #EDE4F7;border-radius:11px;padding:13px;margin-bottom:8px}
+.dsl{font-size:9px;font-weight:700;color:#A090B8;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+.dmr{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #EDE4F7}
+.dmr:last-child{border-bottom:none}
+.dmi{width:26px;height:26px;background:#F9F5FF;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dmi svg{width:12px;height:12px;stroke:#5B1D82;fill:none;stroke-width:1.5}
+.dmn{font-size:12px;font-weight:600;color:#1A0533;flex:1}
+.stpr{display:flex;margin-bottom:12px;overflow-x:auto}
+.stp{display:flex;flex-direction:column;align-items:center;flex:1;min-width:60px;position:relative}
+.stp:not(:last-child)::after{content:'';position:absolute;top:13px;left:50%;right:-50%;height:2px;background:#EDE4F7;z-index:0}
+.stp.dn::after,.stp.cr::after{background:#5B1D82}
+.stpd{width:26px;height:26px;border-radius:50%;background:#fff;border:2px solid #EDE4F7;display:flex;align-items:center;justify-content:center;z-index:1;margin-bottom:4px}
+.stp.dn .stpd,.stp.cr .stpd{background:#5B1D82;border-color:#5B1D82}
+.stpd svg{width:10px;height:10px;stroke:#fff;fill:none;stroke-width:2}
+.stpl{font-size:9px;font-weight:600;color:#7C6A92;text-align:center;line-height:1.3}
+.stp.cr .stpl{color:#5B1D82;font-weight:700}
+.stpw{font-size:8px;color:#A090B8}
+.hog{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:13px}
+.hoc{background:#fff;border:2px solid #EDE4F7;border-radius:11px;padding:14px;transition:all .2s}
+.hoc:hover{border-color:#7C3ABE;transform:translateY(-2px);box-shadow:0 6px 14px rgba(91,29,130,.1)}
+.hoi{width:30px;height:30px;background:#F9F5FF;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:7px}
+.hoi svg{width:13px;height:13px;stroke:#5B1D82;fill:none;stroke-width:1.5}
+.hot{font-size:12px;font-weight:800;color:#1A0533;margin-bottom:3px}
+.hod{font-size:11px;color:#7C6A92;line-height:1.55}
+.gc{background:linear-gradient(135deg,#0D0118,#2D0A52);border-radius:11px;padding:12px;margin-top:8px}
+.gcl{font-size:8px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px}
+.gct{font-size:.95rem;font-weight:800;color:#fff;margin-bottom:3px;line-height:1.2}
+.gcd{font-size:11px;color:rgba(255,255,255,.6);line-height:1.55;margin-bottom:8px}
+.gcm{display:flex;gap:5px;flex-wrap:wrap}
+.gcp{font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.15)}
+.btn-p{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:9px;font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,#5B1D82,#7C3ABE);border:none;box-shadow:0 4px 14px rgba(91,29,130,.3);transition:all .2s;cursor:pointer;font-family:inherit}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(91,29,130,.4)}
+.btn-p svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:1.5}
+.btn-s{display:inline-flex;align-items:center;gap:6px;padding:10px 15px;border-radius:9px;font-size:12px;font-weight:700;color:#4A3560;background:#fff;border:2px solid #E9D5FF;transition:all .2s;cursor:pointer;font-family:inherit}
+.btn-s:hover{background:#F9F5FF;border-color:#7C3ABE}
+.btn-s svg{width:12px;height:12px;stroke:#7C6A92}
+.crow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:11px}
+.notice{background:#DCFCE7;border:1px solid #86EFAC;border-radius:8px;padding:8px 12px;font-size:11px;color:#166534;line-height:1.55;margin-top:10px}
+.dock{flex-shrink:0;background:rgba(255,255,255,.97);border-top:1px solid #EDE4F7;padding:10px 26px}
+.dock-in{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.dock-ctx{font-size:11px;color:#7C6A92}
+.dock-ctx strong{color:#1A0533;font-weight:700}
+.dock-btns{display:flex;gap:7px}
+.btn-go{padding:10px 22px;background:linear-gradient(135deg,#5B1D82,#7C3ABE);color:#fff;border-radius:9px;font-size:12px;font-weight:700;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s;box-shadow:0 4px 14px rgba(91,29,130,.3);font-family:inherit}
+.btn-go:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(91,29,130,.4)}
+.btn-go svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2}
+.btn-bk{padding:10px 13px;background:transparent;color:#7C6A92;border-radius:9px;font-size:12px;font-weight:600;border:2px solid #E9D5FF;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-bk:hover{border-color:#7C3ABE;color:#5B1D82}
+.btn-re{padding:8px 12px;background:#F9F5FF;color:#7C3ABE;border-radius:8px;font-size:11px;font-weight:600;border:1px solid #EDE4F7;cursor:pointer;font-family:inherit}
+.toast{position:absolute;bottom:68px;left:50%;transform:translateX(-50%) translateY(12px);background:#1A0533;color:#fff;padding:9px 18px;border-radius:9px;font-size:12px;font-weight:600;z-index:500;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.live{position:absolute;bottom:60px;right:14px;z-index:20;display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,#0D0118,#3D0F5A);border:1px solid rgba(139,92,246,.5);border-radius:50px;padding:8px 13px 8px 9px;cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(13,1,24,.4);transition:all .2s}
+.live:hover{transform:translateY(-2px)}
+.live-av{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#5B1D82,#7C3ABE);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
+.live-av svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:1.5}
+.live-p{position:absolute;top:-1px;right:-1px;width:7px;height:7px;border-radius:50%;background:#4ADE80;border:1.5px solid #0D0118}
+.live-l{font-size:11px;font-weight:700;color:#fff;line-height:1.2}
+.live-s{font-size:8px;color:rgba(255,255,255,.45)}
+.live-pan{position:absolute;bottom:108px;right:14px;z-index:19;width:265px;background:#fff;border:2px solid #EDE4F7;border-radius:13px;box-shadow:0 16px 40px rgba(13,1,24,.2);display:none;overflow:hidden}
+.live-pan.open{display:block}
+.lph{background:linear-gradient(135deg,#0D0118,#3D0F5A);padding:11px 13px;display:flex;align-items:center;justify-content:space-between}
+.lph-t{font-size:12px;font-weight:700;color:#fff}
+.lph-s{font-size:9px;color:rgba(255,255,255,.45);margin-top:1px}
+.lph-c{width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.1);border:none;cursor:pointer;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;font-family:inherit}
+.lpb{padding:11px 13px}
+.lpa{display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid #EDE4F7;margin-bottom:8px}
+.lpa-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#5B1D82,#7C3ABE);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0}
+.lpa-n{font-size:11px;font-weight:700;color:#1A0533}
+.lpa-r{font-size:9px;color:#7C6A92}
+.lpa-st{margin-left:auto;font-size:9px;font-weight:700;color:#166534;background:#DCFCE7;padding:2px 7px;border-radius:20px;border:1px solid #86EFAC}
+.lp-opts{display:flex;flex-direction:column;gap:5px;margin-bottom:8px}
+.lp-opt{display:flex;align-items:center;gap:7px;padding:8px 10px;border:2px solid #EDE4F7;border-radius:9px;cursor:pointer;background:#fff;font-family:inherit;text-align:left;transition:all .2s}
+.lp-opt:hover{border-color:#5B1D82;background:#F9F5FF}
+.lp-oi{width:24px;height:24px;border-radius:6px;background:#F9F5FF;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lp-oi svg{width:11px;height:11px;stroke:#5B1D82;fill:none;stroke-width:1.5}
+.lp-ol{font-size:11px;font-weight:700;color:#1A0533;line-height:1.3}
+.lp-os{font-size:9px;color:#7C6A92}
+.lp-ft{font-size:9px;color:#A090B8;text-align:center;padding-top:7px;border-top:1px solid #EDE4F7}
+.mkt-pv{background:#F3EEFF;border:2px solid #EDE4F7;border-radius:10px;padding:10px 13px;margin-bottom:12px}
+.pvbar{background:#F9F5FF;border:1px solid #EDE4F7;border-radius:9px;padding:9px 13px;margin-bottom:12px;font-size:12px;color:#4A3560;display:none}
+#secInl{overflow:hidden;max-height:0;opacity:0;transition:max-height .5s ease,opacity .4s ease}
+
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes borderGlow{0%,100%{box-shadow:0 0 0 0 rgba(139,92,246,0)}50%{box-shadow:0 0 0 5px rgba(139,92,246,.18)}}
+@keyframes popIn{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+.ni.active{background:rgba(139,92,246,.18);border:1px solid rgba(139,92,246,.3);animation:borderGlow 2.5s ease infinite}
+.oc.sel .oc-ck{animation:popIn .3s ease}
+.oc-ck{transition:opacity .15s,transform .15s}
+</style>
+</head>
+<body>
+<div id="splash" style="position:fixed;inset:0;background:#0D0118;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0">
+  <div style="position:relative;display:flex;align-items:center;justify-content:center;margin-bottom:20px">
+    <div style="position:absolute;width:90px;height:90px;border-radius:50%;border:1px solid rgba(139,92,246,.35);animation:splRing 2s ease infinite"></div>
+    <div style="position:absolute;width:90px;height:90px;border-radius:50%;border:1px solid rgba(139,92,246,.2);animation:splRing 2s ease .65s infinite"></div>
+    <div style="position:absolute;width:90px;height:90px;border-radius:50%;border:1px solid rgba(139,92,246,.1);animation:splRing 2s ease 1.3s infinite"></div>
+    <div style="width:52px;height:52px;background:linear-gradient(135deg,#5B1D82,#7C3ABE);border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(91,29,130,.5);z-index:1">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4" stroke-width="2.5"/></svg>
+    </div>
+  </div>
+  <div style="font-size:22px;font-weight:800;color:white;letter-spacing:-.5px;margin-bottom:4px">PromoVeritas</div>
+  <div style="font-size:10px;font-weight:700;color:rgba(139,92,246,.7);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:32px">CaaS</div>
+  <div style="width:140px;height:2px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px">
+    <div style="height:100%;background:linear-gradient(90deg,#5B1D82,#C084FC);border-radius:2px;animation:splBar 2s ease forwards"></div>
+  </div>
+  <div style="font-size:10px;color:rgba(255,255,255,.2);letter-spacing:1px">Powered by <span style="color:rgba(255,255,255,.45);font-weight:600">Apply AI</span></div>
+</div>
+<style>
+@keyframes splRing{0%{transform:scale(1);opacity:.7}80%,100%{transform:scale(2.2);opacity:0}}
+@keyframes splBar{0%{width:0}60%{width:80%}100%{width:100%}}
+@keyframes splFade{to{opacity:0;pointer-events:none}}
+</style>
+
+<div class="app">
+  <div class="sb">
+    <button class="sb-head" onclick="goHome()">
+      <div>
+        <div style="font-size:16px;font-weight:900;color:white;letter-spacing:-.5px;line-height:1.1">Promo<span style="color:#C084FC">Veritas</span></div>
+        <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;margin-top:2px">Compliance as a Service</div>
+      </div>
+    </button>
+    <div class="sb-nav" id="sbNav">
+      <div class="grp-lbl">Your campaign</div>
+      <button class="ni active" data-s="0" onclick="sbGo(0)"><div class="nn"><span class="nn-n">1</span><svg class="nn-ck" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div><div class="nl">Campaign</div><div class="ns" id="ns0">Name your campaign</div></div></button>
+      <button class="ni" data-s="3" onclick="sbGo(3)"><div class="nn"><span class="nn-n">2</span><svg class="nn-ck" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div><div class="nl">Goals</div><div class="ns">What to achieve</div></div></button>
+      <button class="ni" data-s="4" onclick="sbGo(4)"><div class="nn"><span class="nn-n">3</span><svg class="nn-ck" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div><div class="nl">Your idea</div><div class="ns">Describe the campaign</div></div></button>
+      <div class="grp-lbl">Compliance</div>
+      <button class="ni" data-s="5" onclick="sbGo(5)"><div class="nn"><span class="nn-n">4</span><svg class="nn-ck" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div><div class="nl">Markets</div><div class="ns" id="ns5">Select countries</div></div></button>
+      <button class="ni" data-s="6" onclick="sbGo(6)"><div class="nn"><span class="nn-n">5</span><svg class="nn-ck" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div><div class="nl">Mechanics</div><div class="ns">Explore options</div></div></button>
+      <div class="grp-lbl">Output</div>
+      <button class="ni" data-s="7" onclick="sbGo(7)"><div class="nn"><span class="nn-n">6</span><svg class="nn-ck" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div><div class="nl">Smart Brief</div><div class="ns">Compliance summary</div></div></button>
+      <button class="ni" data-s="8" onclick="sbGo(8)"><div class="nn"><span class="nn-n">7</span><svg class="nn-ck" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div><div class="nl">Dashboard</div><div class="ns">Stage 1 overview</div></div></button>
+      <button class="ni" data-s="9" onclick="sbGo(9)"><div class="nn"><span class="nn-n">8</span><svg class="nn-ck" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div><div class="nl">Handoff</div><div class="ns">Next steps with PV</div></div></button>
+    </div>
+    <div class="sb-foot">
+      <button class="u-btn" onclick="alert('Lisa Mallett\nlisa.mallett@promoveritas.com')">
+        <div class="u-av">LM</div>
+        <div><div class="u-name">Lisa Mallett</div><div class="u-role">Head of Marketing, Global</div></div>
+      </button>
+    </div>
+  </div>
+  <div class="main">
+    <div class="prog"><div class="prog-fill" id="pf"></div></div>
+    <div class="screens" id="screens">
+
+      <div class="scr active" id="s0">
+        <div class="sh"><div class="sh-in"><div class="sh-pill"><div class="sh-dot"></div>Compliance Stress-Test</div><h1 class="sh-h1">Let's stress-test<br><em>your idea.</em></h1><p class="sh-p">Tell us about your campaign and we'll surface every compliance consideration before it becomes a problem.</p></div><div class="sh-stats"><div><span class="sh-sv">93</span><span class="sh-sl">markets</span></div><div class="sh-sep"></div><div><span class="sh-sv">20+</span><span class="sh-sl">years</span></div><div class="sh-sep"></div><div><span class="sh-sv">1,500</span><span class="sh-sl">promos/yr</span></div></div></div>
+        <div class="bd">
+          <div class="lbl">Campaign name</div>
+          <input class="inp" id="campInp" placeholder="e.g. Summer Loyalty Programme 2026" oninput="S.campaign=this.value;updUI()" style="margin-bottom:20px">
+          <div class="lbl">Recent campaigns</div>
+          <div class="rcg">
+            <div class="rcc" onclick="loadR('Tui Summer Promotion','Travel','UK,DE,AT,CH,NL,BE',0)"><div class="rc-dot" style="background:#3B82F6"></div><div class="rc-n">Tui Summer Promotion</div><div class="rc-m">Travel · 6 markets</div><div class="rc-s">Stage 1 complete</div></div>
+            <div class="rcc" onclick="loadR('Lego Creator Series','Retail','UK,DE,FR,NL,BE,SE,DK',1)"><div class="rc-dot" style="background:#10B981"></div><div class="rc-n">Lego Creator Series</div><div class="rc-m">Retail · 7 markets</div><div class="rc-s live">Live</div></div>
+            <div class="rcc" onclick="loadR('Avolta Loyalty Drive','Travel','UK,FR,DE,CH',3)"><div class="rc-dot" style="background:#8B5CF6"></div><div class="rc-n">Avolta Loyalty Drive</div><div class="rc-m">Travel · 4 markets</div><div class="rc-s">T&amp;Cs review</div></div>
+          </div>
+          <div class="div-row"><div class="div-line"></div><div class="div-lbl">Campaign structure</div><div class="div-line"></div></div>
+          <div class="og c2" style="margin-bottom:10px">
+            <button class="oc" id="nrB" onclick="selNar('brand',this)"><div class="oc-i"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><div class="oc-l">In-house</div><div class="oc-s">We're the brand running this directly</div><div class="oc-ck"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5"><path d="M2 6l2.5 2.5 5-5"/></svg></div></button>
+            <button class="oc" id="nrA" onclick="selNar('agency',this)"><div class="oc-i"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="oc-l">Through an agency</div><div class="oc-s">We're briefing an external agency</div><div class="oc-ck"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5"><path d="M2 6l2.5 2.5 5-5"/></svg></div></button>
+          </div>
+          <div id="secInl">
+            <div class="div-row"><div class="div-line"></div><div class="div-lbl">Sector</div><div class="div-line"></div></div>
+            <div class="og ca" id="secG">
+              <button class="oc" onclick="selSec('FMCG',this)"><div class="oc-l">FMCG</div><div class="oc-ck"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5"><path d="M2 6l2.5 2.5 5-5"/></svg></div></button>
+              <button class="oc" onclick="selSec('Retail',this)"><div class="oc-l">Retail</div><div class="oc-ck"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5"><path d="M2 6l2.5 2.5 5-5"/></svg></div></button>
+              <button class="oc" onclick="selSec('Travel',this)"><div class="oc-l">Travel</div><div class="oc-ck"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5"><path d="M2 6l2.5 2.5 5-5"/></svg></div></button>
+              <button class="oc" onclick="selSec('Technology',this)"><div class="oc-l">Technology</div><div class="oc-ck"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5"><path d="M2 6l2.5 2.5 5-5"/></svg></div></button>
+              <button class="oc" onclick="selSec('Alcohol',this)"><div class="oc-l">Alcohol</div><div class="oc-ck"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5"><path d="M2 6l2.5 2.5 5-5"/></svg></div></button>
+              <button class="oc" onclick="selSec('Healthcare',this)"><div class="oc-l">Healthcare</div><div class="oc-ck"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5"><path d="M2 6l2.5 2.5 5-5"/></svg></div></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scr" id="s3">
+        <div class="sh sh-alt"><div class="sh-in"><div class="sh-pill"><div class="sh-dot"></div>Campaign goals<span class="sh-tag" id="ey3"></span></div><h1 class="sh-h1">What are you<br><em>trying to achieve?</em></h1><p class="sh-p">First selection = Primary. Additional = Secondary.</p></div><div class="sh-stats"><div><span class="sh-sv">5</span><span class="sh-sl">goal types</span></div><div class="sh-sep"></div><div><span class="sh-sv">4</span><span class="sh-sl">mechanics</span></div><div class="sh-sep"></div><div><span class="sh-sv">93</span><span class="sh-sl">markets</span></div></div></div>
+        <div class="bd">
+          <div class="og c2" id="goalG">
+            <button class="oc" onclick="selGoal(0,this)"><div class="oc-t" id="gt0">Primary</div><div class="oc-i"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div><div class="oc-l">Increase rate of sale</div><div class="oc-s">Drive purchase at point of decision</div><div class="oc-ck"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5"><path d="M2 6l2.5 2.5 5-5"/></svg></div></button>
+            <button class="oc" onclick="selGoal(1,this)"><div class="oc-t" id="gt1">Primary</div><div class="oc-i"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="oc-l">Drive trial of a new SKU</div><div class="oc-s">Get consumers to try something new</div><div class="oc-ck"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5"><path d="M2 6l2.5 2.5 5-5"/></svg></div></button>
+            <button class="oc" onclick="selGoal(2,this)"><div class="oc-t" id="gt2">Primary</div><div class="oc-i"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><div class="oc-l">Increase engagement</div><div class="oc-s">Build brand connection and interaction</div><div class="oc-ck"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5"><path d="M2 6l2.5 2.5 5-5"/></svg></div></button>
+            <button class="oc" onclick="selGoal(3,this)"><div class="oc-t" id="gt3">Primary</div><div class="oc-i"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg></div><div class="oc-l">Repeat purchase &amp; loyalty</div><div class="oc-s">Encourage ongoing brand commitment</div><div class="oc-ck"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5"><path d="M2 6l2.5 2.5 5-5"/></svg></div></button>
+            <button class="oc" onclick="selGoal(4,this)"><div class="oc-t" id="gt4">Primary</div><div class="oc-i"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="oc-l">Retail activation</div><div class="oc-s">Drive in-store performance</div><div class="oc-ck"><svg width="9" height="9" viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5"><path d="M2 6l2.5 2.5 5-5"/></svg></div></button>
+          </div>
+          <div id="gcPanel" style="display:none"><div class="gc"><div class="gcl" id="gcL">Primary goal</div><div class="gct" id="gcT"></div><div class="gcd" id="gcD"></div><div class="gcm" id="gcM"></div></div></div>
+        </div>
+      </div>
+
+      <div class="scr" id="s4">
+        <div class="sh sh-alt"><div class="sh-in"><div class="sh-pill"><div class="sh-dot"></div>Campaign brief<span class="sh-tag" id="ey4"></span></div><h1 class="sh-h1">Tell us about<br><em>your idea.</em></h1><p class="sh-p">The more context you give, the more precise our guidance.</p></div><div class="sh-stats"><div><span class="sh-sv">20+</span><span class="sh-sl">years</span></div><div class="sh-sep"></div><div><span class="sh-sv">3</span><span class="sh-sl">docs read</span></div><div class="sh-sep"></div><div><span class="sh-sv">93</span><span class="sh-sl">markets</span></div></div></div>
+        <div class="bd">
+          <textarea class="inp" id="ideaInp" placeholder="e.g. A pan-European loyalty promotion where consumers collect points and enter a monthly prize draw across UK, Germany and France..." oninput="S.idea=this.value;updWC()" style="margin-bottom:6px"></textarea>
+          <div style="display:flex;justify-content:space-between;margin-bottom:16px"><div style="font-size:11px;color:#7C6A92">Optional — but the more detail, the better</div><div id="wc" style="font-size:10px;font-weight:700;color:#7C6A92">0 words</div></div>
+          <div class="lbl">Prompts</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:16px">
+            <button class="chip" onclick="insTopic(this,'Mechanic type: ')">Mechanic type</button>
+            <button class="chip" onclick="insTopic(this,'Prize or gift value: ')">Prize / gift value</button>
+            <button class="chip" onclick="insTopic(this,'Campaign duration: ')">Duration</button>
+            <button class="chip" onclick="insTopic(this,'On-pack or digital: ')">On-pack or digital</button>
+            <button class="chip" onclick="insTopic(this,'Purchase required: ')">Purchase required?</button>
+          </div>
+          <div class="lbl">Examples</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px">
+            <button class="chip" onclick="setEx(this)" data-i="On-pack instant win running across UK, Germany and France. Consumers find a code under the cap and enter online. Main prize is a holiday. 8 weeks.">On-pack instant win · EU</button>
+            <button class="chip" onclick="setEx(this)" data-i="Gift with purchase for a new product launch in UK and Ireland. Buy 2 products, get a free branded gift. In-store and online for 6 weeks.">Gift with purchase · UK/IE</button>
+            <button class="chip" onclick="setEx(this)" data-i="Social media prize draw on Instagram and TikTok. Follow, like and tag to enter. UK-wide, 4 weeks. Main prize £5,000 cash. No purchase necessary.">Social prize draw</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="scr" id="s5">
+        <div class="sh sh-alt"><div class="sh-in"><div class="sh-pill"><div class="sh-dot"></div>Markets in scope<span class="sh-tag" id="ey5"></span></div><h1 class="sh-h1">Where will this<br><em>promotion run?</em></h1><p class="sh-p">Select all markets. More markets = more complex compliance picture.</p></div><div class="sh-stats"><div><span class="sh-sv">93</span><span class="sh-sl">markets</span></div><div class="sh-sep"></div><div><span class="sh-sv">18</span><span class="sh-sl">in tool</span></div><div class="sh-sep"></div><div><span class="sh-sv">20+</span><span class="sh-sl">years</span></div></div></div>
+        <div class="bd">
+          <div id="mktPv"></div>
+          <div class="dial-w">
+            <div style="position:relative;width:85px;height:85px"><svg width="85" height="85" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="#EDE4F7" stroke-width="8"/><circle cx="50" cy="50" r="38" fill="none" stroke="#5B1D82" stroke-width="8" stroke-linecap="round" stroke-dasharray="239" stroke-dashoffset="214" id="dArc" style="transform:rotate(-90deg);transform-origin:50px 50px;transition:stroke-dashoffset .8s ease,stroke .5s"/></svg><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div id="dN" style="font-size:1.4rem;font-weight:800;color:#5B1D82;line-height:1">1</div><div style="font-size:8px;color:#7C6A92;font-weight:700;text-transform:uppercase;letter-spacing:1px">markets</div></div></div>
+            <div><div id="dL" style="font-size:.95rem;font-weight:800;color:#1A0533;margin-bottom:3px">Simple</div><div id="dS" style="font-size:11px;color:#7C6A92;line-height:1.5">Single market — standard compliance applies.</div></div>
+          </div>
+          <div class="mr"><div class="mr-h"><div class="mr-l">🇬🇧 UK &amp; Ireland</div><button class="mr-a" onclick="event.stopPropagation();selReg(['UK','IE'])">Select all</button></div><div class="mg"><button class="mc on" data-mkt="UK" onclick="togM(this,'UK')"><span>🇬🇧</span>UK</button><button class="mc" data-mkt="IE" onclick="togM(this,'IE')"><span>🇮🇪</span>Ireland</button></div></div>
+          <div class="mr"><div class="mr-h"><div class="mr-l">🌍 Continental Europe</div><button class="mr-a" onclick="event.stopPropagation();selReg(['DE','FR','NL','BE','CH','AT','ES','IT','PL'])">Select all</button></div><div class="mg"><button class="mc" data-mkt="DE" onclick="togM(this,'DE')"><span>🇩🇪</span>Germany</button><button class="mc" data-mkt="FR" onclick="togM(this,'FR')"><span>🇫🇷</span>France</button><button class="mc" data-mkt="NL" onclick="togM(this,'NL')"><span>🇳🇱</span>Netherlands</button><button class="mc" data-mkt="BE" onclick="togM(this,'BE')"><span>🇧🇪</span>Belgium</button><button class="mc" data-mkt="CH" onclick="togM(this,'CH')"><span>🇨🇭</span>Switzerland</button><button class="mc" data-mkt="AT" onclick="togM(this,'AT')"><span>🇦🇹</span>Austria</button><button class="mc" data-mkt="ES" onclick="togM(this,'ES')"><span>🇪🇸</span>Spain</button><button class="mc" data-mkt="IT" onclick="togM(this,'IT')"><span>🇮🇹</span>Italy</button><button class="mc" data-mkt="PL" onclick="togM(this,'PL')"><span>🇵🇱</span>Poland</button></div></div>
+          <div class="mr"><div class="mr-h"><div class="mr-l">❄️ Nordics</div><button class="mr-a" onclick="event.stopPropagation();selReg(['SE','NO','DK','FI'])">Select all</button></div><div class="mg"><button class="mc" data-mkt="SE" onclick="togM(this,'SE')"><span>🇸🇪</span>Sweden</button><button class="mc" data-mkt="NO" onclick="togM(this,'NO')"><span>🇳🇴</span>Norway</button><button class="mc" data-mkt="DK" onclick="togM(this,'DK')"><span>🇩🇰</span>Denmark</button><button class="mc" data-mkt="FI" onclick="togM(this,'FI')"><span>🇫🇮</span>Finland</button></div></div>
+          <div class="mr"><div class="mr-h"><div class="mr-l">🌐 Rest of world</div><button class="mr-a" onclick="event.stopPropagation();selReg(['US','AU','CA'])">Select all</button></div><div class="mg"><button class="mc" data-mkt="US" onclick="togM(this,'US')"><span>🇺🇸</span>USA</button><button class="mc" data-mkt="AU" onclick="togM(this,'AU')"><span>🇦🇺</span>Australia</button><button class="mc" data-mkt="CA" onclick="togM(this,'CA')"><span>🇨🇦</span>Canada</button></div></div>
+        </div>
+      </div>
+
+      <div class="scr" id="s6">
+        <div class="sh sh-alt"><div class="sh-in"><div class="sh-pill"><div class="sh-dot"></div>Mechanics<span class="sh-tag" id="ey6"></span></div><h1 class="sh-h1">Here's what we<br><em>recommend exploring.</em></h1><p class="sh-p">Based on your goals and markets. Expand each card for full compliance detail.</p></div><div class="sh-stats"><div><span class="sh-sv">4</span><span class="sh-sl">mechanics</span></div><div class="sh-sep"></div><div><span class="sh-sv">PV</span><span class="sh-sl">verified</span></div><div class="sh-sep"></div><div><span class="sh-sv">93</span><span class="sh-sl">markets</span></div></div></div>
+        <div class="bd">
+          <div class="pvbar" id="pvBar"></div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:12px"><div id="mCnt" style="font-size:2rem;font-weight:800;color:#1A0533;line-height:1">—</div><div style="font-size:12px;color:#7C6A92">mechanics</div><div id="mDesc" style="font-size:12px;color:#4A3560;margin-left:6px"></div></div>
+          <div class="mcl" id="mCards"></div>
+          <div id="ttcW"></div>
+          <div class="crow" id="mCrow" style="display:none">
+            <button class="btn-p" onclick="doPV()"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Chat with Compliance</button>
+            <button class="btn-s" onclick="doPV()"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>Send question</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="scr" id="s7">
+        <div class="sh sh-alt"><div class="sh-in"><div class="sh-pill"><div class="sh-dot"></div>Smart Brief<span class="sh-tag" id="ey7"></span></div><h1 class="sh-h1">Your compliance<br><em>stress-test results.</em></h1></div><div class="sh-stats"><div><span class="sh-sv">1</span><span class="sh-sl">brief</span></div><div class="sh-sep"></div><div><span class="sh-sv">Stage</span><span class="sh-sl">1 ready</span></div><div class="sh-sep"></div><div><span class="sh-sv">24h</span><span class="sh-sl">turnaround</span></div></div></div>
+        <div class="bd">
+          <div class="bh"><div class="bh-l">PromoVeritas · Smart Brief</div><div class="bh-t">Your compliance stress-test results</div><div class="bh-s"><div><div class="bsv" id="bsG">—</div><div class="bsl">goals</div></div><div><div class="bsv" id="bsM">—</div><div class="bsl">markets</div></div><div><div class="bsv" id="bsMc">—</div><div class="bsl">mechanics</div></div></div></div>
+          <div class="bg2"><div class="bc"><div class="bcl">Campaign</div><div class="bcv" id="bCamp">—</div></div><div class="bc"><div class="bcl">Date</div><div class="bcv" id="bDate">—</div></div><div class="bc"><div class="bcl">Primary goal</div><div class="bcv" id="bGoal">—</div></div><div class="bc"><div class="bcl">Markets</div><div class="bcv" id="bMkts">—</div></div></div>
+          <div id="rGW"></div><div class="bsec" id="bOv"></div><div class="bsec" id="bRk"></div><div class="bsec" id="bNx"></div>
+          <div class="crow" style="margin-top:10px"><button class="btn-p" onclick="doPV()"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Chat with Compliance</button><button class="btn-s" onclick="doPV()"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>Send question</button></div>
+          <div class="notice">Guidance only — not legal advice. PromoVeritas expertise should be engaged before any campaign proceeds to market.</div>
+        </div>
+      </div>
+
+      <div class="scr" id="s8">
+        <div class="sh sh-green"><div class="sh-in"><div class="sh-pill"><div class="sh-dot" style="background:#4ADE80"></div>Stage 1 · Dashboard<span class="sh-tag" id="ey8"></span></div><h1 class="sh-h1">Campaign compliance<br><em style="color:rgba(255,255,255,.5)">overview.</em></h1></div><div class="sh-stats"><div><span class="sh-sv">Stage</span><span class="sh-sl">1</span></div><div class="sh-sep"></div><div><span class="sh-sv">PV</span><span class="sh-sl">review</span></div><div class="sh-sep"></div><div><span class="sh-sv">24h</span><span class="sh-sl">response</span></div></div></div>
+        <div class="bd">
+          <div class="dh"><div class="bh-l" style="color:rgba(255,255,255,.4)">Stage 1 · Compliance Dashboard</div><div class="bh-t">Campaign compliance<br><em style="font-style:italic;font-weight:300;color:rgba(255,255,255,.6)">overview</em></div></div>
+          <div id="dashC"></div>
+          <div class="crow" style="margin-top:10px"><button class="btn-p" onclick="doPV()"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Chat with Compliance</button><button class="btn-s" onclick="doPV()"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>Send question</button></div>
+          <div class="notice">Guidance only — not legal advice.</div>
+        </div>
+      </div>
+
+      <div class="scr" id="s9">
+        <div class="sh sh-alt"><div class="sh-in"><div class="sh-pill"><div class="sh-dot"></div>Stress-test complete<span class="sh-tag" id="ey9"></span></div><h1 class="sh-h1">Your idea has been<br><em>stress-tested.</em></h1><p class="sh-p">Here's what happens next with PromoVeritas.</p></div><div class="sh-stats"><div><span class="sh-sv">24h</span><span class="sh-sl">turnaround</span></div><div class="sh-sep"></div><div><span class="sh-sv">Stage</span><span class="sh-sl">1</span></div><div class="sh-sep"></div><div><span class="sh-sv">PV</span><span class="sh-sl">expert</span></div></div></div>
+        <div class="bd">
+          <div class="hog">
+            <div class="hoc"><div class="hoi"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="hot">Stage 1 Compliance Review</div><div class="hod">PromoVeritas reviews your campaign concept and provides a detailed feasibility assessment across all selected markets.</div></div>
+            <div class="hoc"><div class="hoi"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="hot">T&amp;Cs Drafting</div><div class="hod">Local T&amp;Cs drafted and localised for each market, with all mandatory disclosures and market-specific legal references.</div></div>
+            <div class="hoc"><div class="hoi"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="hot">Timeline Planning</div><div class="hod">PromoVeritas maps the compliance timeline against your go-live date, identifying all critical path items.</div></div>
+            <div class="hoc"><div class="hoi"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="hot">Expert Handoff</div><div class="hod">Your Smart Brief is passed to a senior PromoVeritas compliance manager who will be your point of contact throughout.</div></div>
+          </div>
+          <div style="background:linear-gradient(140deg,#0D0118,#2D0A52);border-radius:13px;padding:1.4rem;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:11px">
+            <div><div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px">Ready to proceed?</div><div style="font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:3px">Book your Stage 1 review</div><div style="font-size:11px;color:rgba(255,255,255,.5)">A senior compliance manager will review your brief within 24 hours.</div></div>
+            <button class="btn-p" onclick="doPV()" style="flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Get in touch</button>
+          </div>
+          <div class="crow"><button class="btn-s" onclick="doPV()"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>Send a question</button><button class="btn-s" onclick="dlBrief()"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download Smart Brief</button></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="dock"><div class="dock-in"><div class="dock-ctx" id="dCtx"></div><div class="dock-btns" id="dBtns"></div></div></div>
+    <div class="toast" id="toast"></div>
+    <button class="live" onclick="togLP()"><div class="live-av"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><div class="live-p"></div></div><div><div class="live-l">James Patterson</div><div class="live-s">Senior Compliance · Online</div></div></button>
+    <div class="live-pan" id="lpan"><div class="lph"><div><div class="lph-t">PromoVeritas Support</div><div class="lph-s">Typically replies in minutes</div></div><button class="lph-c" onclick="togLP()">✕</button></div><div class="lpb"><div class="lpa"><div class="lpa-av">JP</div><div><div class="lpa-n">James Patterson</div><div class="lpa-r">Senior Compliance Manager</div></div><div class="lpa-st">Online</div></div><div class="lp-opts"><button class="lp-opt" onclick="doPV();togLP()"><div class="lp-oi"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><div><div class="lp-ol">Chat about my campaign</div><div class="lp-os">Share your Smart Brief</div></div></button><button class="lp-opt" onclick="doPV();togLP()"><div class="lp-oi"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div><div class="lp-ol">Ask a question</div><div class="lp-os">Quick compliance query</div></div></button><button class="lp-opt" onclick="doPV();togLP()"><div class="lp-oi"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div><div class="lp-ol">Book Stage 1 review</div><div class="lp-os">Get a senior manager on it</div></div></button></div><div class="lp-ft">PromoVeritas · 93 markets · 20+ years</div></div></div>
+  </div>
+</div>
+<script>
+var S={cur:0,campaign:'',nar:'brand',sector:'',outcomes:[],primary:-1,idea:'',markets:['UK'],dismissed:[]};
+var FLOW=[0,3,4,5,6,7,8,9];
+var OUT=[{l:'Increase rate of sale',d:'Promotions that drive purchase at point of decision.',m:['Prize Draw','Instant Win','Gift with Purchase']},{l:'Drive trial of a new SKU',d:'Getting consumers to try something new.',m:['Gift with Purchase','Prize Draw','Competition']},{l:'Increase consumer engagement',d:'Building brand interaction and community.',m:['Competition','Prize Draw','Instant Win']},{l:'Repeat purchase & loyalty',d:'Encouraging ongoing brand commitment.',m:['Gift with Purchase','Prize Draw','Competition']},{l:'Retail activation',d:'Driving in-store performance and visibility.',m:['Gift with Purchase','Prize Draw','Instant Win']}];
+var MKT={UK:{n:'UK',f:'🇬🇧'},IE:{n:'Ireland',f:'🇮🇪'},DE:{n:'Germany',f:'🇩🇪'},FR:{n:'France',f:'🇫🇷'},NL:{n:'Netherlands',f:'🇳🇱'},BE:{n:'Belgium',f:'🇧🇪'},CH:{n:'Switzerland',f:'🇨🇭'},AT:{n:'Austria',f:'🇦🇹'},ES:{n:'Spain',f:'🇪🇸'},IT:{n:'Italy',f:'🇮🇹'},PL:{n:'Poland',f:'🇵🇱'},SE:{n:'Sweden',f:'🇸🇪'},NO:{n:'Norway',f:'🇳🇴'},DK:{n:'Denmark',f:'🇩🇰'},FI:{n:'Finland',f:'🇫🇮'},US:{n:'USA',f:'🇺🇸'},AU:{n:'Australia',f:'🇦🇺'},CA:{n:'Canada',f:'🇨🇦'}};
+var MECHS={0:[{n:'Prize Draw',ic:'tg',d:'Widely run mechanic globally. No special authorisations in most European markets.',r:'low',mkt:{UK:'ok',IE:'watch',DE:'ok',FR:'ok',NL:'ok',BE:'high',DK:'watch',SE:'ok',NO:'ok',FI:'ok',CH:'ok',AT:'ok',ES:'high',IT:'high',PL:'high',AU:'watch',CA:'watch',US:'watch'},cons:['UK: No registration required. Price must not be inflated.','Germany: No registration. T&Cs in German. Must have start and end date.','France: Register T&Cs with Huissier as best practice (3 working days).','Ireland: Prize pool under €2,500 needs no licence. Over €2,500 requires district court lottery licence — apply 60 days before start.','Belgium: Purchase-linked draws require a genuine skill element.','Denmark: Register with SKAT via VIRK (5 working days). Tax: 17.5% on prizes over threshold.','Norway: Prize tax 28% on prizes over NOK 10,000.','Finland: Lottery tax 30% of total prize value. Cannot target children.','Spain: Registration required. Spanish entity required.','Italy: Registration required. Italian entity required.','Poland: Lottery licence required — very difficult to obtain.','Australia: NSW registration if prize pool over AU$10,000.','Canada: NPN required for purchase-linked draws. Skill-testing question for winner.']},{n:'Instant Win',ic:'zp',d:'Consumers find out immediately if they have won. Strong on-pack performance.',r:'mid',mkt:{UK:'ok',IE:'watch',DE:'ok',FR:'ok',NL:'ok',BE:'high',DK:'watch',SE:'ok',NO:'ok',FI:'ok',CH:'ok',AT:'ok',ES:'high',IT:'high',PL:'high',AU:'watch',CA:'ok',US:'ok'},cons:['UK: Permitted. No registration.','Germany: Permitted. No registration. T&Cs in German.','Belgium: Purchase-linked instant wins require a genuine skill element.','Ireland: Prize pool under €2,500 needs no licence. Above requires lottery licence (60 days notice).','Denmark: Register with SKAT (5 working days).','Finland: Lottery tax 30% of prize value. Cannot target children.','Norway: Prize tax 28% on prizes over NOK 10,000.','Spain: Registration required.','Italy: Registration required.','On-pack mechanics: allow 12–16 week lead time.']},{n:'Gift with Purchase',ic:'gi',d:'Guaranteed gift upon qualifying purchase. No element of chance — typically the simplest mechanic.',r:'low',mkt:{UK:'ok',IE:'ok',DE:'watch',FR:'ok',NL:'ok',BE:'ok',DK:'watch',SE:'ok',NO:'ok',FI:'ok',CH:'ok',AT:'watch',ES:'ok',IT:'ok',PL:'ok',AU:'ok',CA:'ok',US:'ok'},cons:['UK: Permitted. Cannot call item "free" if consumer pays a contribution.','Germany: Gift details must be disclosed upfront. T&Cs in German.','Ireland: Gift details must be disclosed upfront per ASAI Code.','Belgium: Gift details CAN be delayed — unique exception.','Denmark: Gift cap of DKK 1,000 (approx. £115). Postage at actual cost only.','Austria: Postage contribution NOT permitted.','Finland: If gift over €10, value must be disclosed in marketing.']},{n:'Competition',ic:'tr',d:'Winners determined by skill or judged entries. Strongest creative engagement mechanic.',r:'mid',mkt:{UK:'ok',IE:'ok',DE:'ok',FR:'ok',NL:'ok',BE:'ok',DK:'ok',SE:'ok',NO:'ok',FI:'ok',CH:'ok',AT:'ok',ES:'high',IT:'high',PL:'ok',AU:'ok',CA:'watch',US:'ok'},cons:['UK: Permitted. Genuine skill element required.','Germany: No registration. Judging criteria must be clearly stated.','Belgium: Competition with genuine skill is PERMITTED — recommended for purchase-linked mechanics.','Ireland: Permitted. No licence required.','Italy: Registration required.','Spain: Registration required.','Australia: No permit required for genuine game of skill.','Canada: Skill-testing question required.']}],1:[{n:'Gift with Purchase',ic:'gi',d:'Most effective mechanic for trial.',r:'low',mkt:{UK:'ok',IE:'ok',DE:'watch',FR:'ok',NL:'ok',BE:'ok',DK:'watch',SE:'ok',NO:'ok',FI:'ok',CH:'ok',AT:'watch',ES:'ok',IT:'ok',PL:'ok',AU:'ok',CA:'ok',US:'ok'},cons:['Germany: Gift details essential — disclose upfront.','Ireland: Gift details upfront. Delayed disclosure deemed misleading.','Belgium: Gift CAN be delayed.','Denmark: Gift cap DKK 1,000 (~£115).','Finland: Gift over €10 — value must be disclosed.','Austria: Postage contribution NOT permitted.']},{n:'Prize Draw',ic:'tg',d:'Drives trial through aspirational prize.',r:'low',mkt:{UK:'ok',IE:'watch',DE:'ok',FR:'ok',NL:'ok',BE:'high',DK:'watch',SE:'ok',NO:'ok',FI:'ok',CH:'ok',AT:'ok',ES:'high',IT:'high',PL:'high',AU:'watch',CA:'watch',US:'watch'},cons:['Belgium: Purchase-linked draw requires genuine skill element.','Ireland: Under €2,500 no licence; over requires district court licence (60 days notice).','Denmark: Register with SKAT (5 working days).','Finland: Lottery tax 30%.','Norway: Prize tax 28% over NOK 10,000.','Spain: Registration required.','Italy: Registration required.']},{n:'Instant Win',ic:'zp',d:'Immediate reward on trial purchase.',r:'mid',mkt:{UK:'ok',IE:'watch',DE:'ok',FR:'ok',NL:'ok',BE:'high',DK:'watch',SE:'ok',NO:'ok',FI:'ok',CH:'ok',AT:'ok',ES:'high',IT:'high',PL:'high',AU:'watch',CA:'ok',US:'ok'},cons:['Belgium: Purchase-linked instant win not permitted without skill element.','Ireland: Prize pool thresholds apply.','On-pack: allow 12–16 week compliance lead time.','Denmark: Register with SKAT.','Finland: 30% lottery tax.','Norway: 28% prize tax.','Spain / Italy: Registration required.']},{n:'Competition',ic:'tr',d:'Skill-based trial driver. Belgium-safe.',r:'mid',mkt:{UK:'ok',IE:'ok',DE:'ok',FR:'ok',NL:'ok',BE:'ok',DK:'ok',SE:'ok',NO:'ok',FI:'ok',CH:'ok',AT:'ok',ES:'high',IT:'high',PL:'ok',AU:'ok',CA:'watch',US:'ok'},cons:['Belgium: Recommended purchase-linked mechanic.','Italy / Spain: Registration required.','Canada: Skill-testing question required.']}],2:[{n:'Competition',ic:'tr',d:'Deepest consumer engagement mechanic.',r:'mid',mkt:{UK:'ok',IE:'ok',DE:'ok',FR:'ok',NL:'ok',BE:'ok',DK:'ok',SE:'ok',NO:'ok',FI:'ok',CH:'ok',AT:'ok',ES:'high',IT:'high',PL:'ok',AU:'ok',CA:'watch',US:'ok'},cons:['Belgium: Purchase-linked with genuine skill is the ONLY permitted purchase-linked mechanic.','Italy: Registration required.','Spain: Registration required.','UK: Genuine skill required.','Germany: T&Cs in German.','Australia: No permit required.','Canada: Skill-testing question required.']},{n:'Prize Draw',ic:'tg',d:'Broad reach engagement mechanic.',r:'low',mkt:{UK:'ok',IE:'watch',DE:'ok',FR:'ok',NL:'ok',BE:'high',DK:'watch',SE:'ok',NO:'ok',FI:'ok',CH:'ok',AT:'ok',ES:'high',IT:'high',PL:'high',AU:'watch',CA:'watch',US:'watch'},cons:['Belgium: Purchase-linked draws require genuine skill element.','Ireland: Prize pool threshold applies.','Denmark: SKAT registration required.','Finland: 30% lottery tax.','Norway: 28% prize tax.','Spain / Italy: Registration required.','Poland: Lottery licence required.']},{n:'Instant Win',ic:'zp',d:'Immediate reward for engagement action.',r:'mid',mkt:{UK:'ok',IE:'watch',DE:'ok',FR:'ok',NL:'ok',BE:'high',DK:'watch',SE:'ok',NO:'ok',FI:'ok',CH:'ok',AT:'ok',ES:'high',IT:'high',PL:'high',AU:'watch',CA:'ok',US:'ok'},cons:['Belgium: Purchase-linked not permitted without genuine skill element.','Ireland: Prize pool thresholds apply.','Denmark: SKAT registration required.','Finland: 30% lottery tax.','Norway: 28% prize tax.','Spain / Italy: Registration required.']},{n:'Gift with Purchase',ic:'gi',d:'Guaranteed reward for engagement.',r:'low',mkt:{UK:'ok',IE:'ok',DE:'watch',FR:'ok',NL:'ok',BE:'ok',DK:'watch',SE:'ok',NO:'ok',FI:'ok',CH:'ok',AT:'watch',ES:'ok',IT:'ok',PL:'ok',AU:'ok',CA:'ok',US:'ok'},cons:['Germany: Gift details essential.','Ireland: Disclose gift details upfront.','Belgium: Gift delay permitted.','Denmark: Gift cap DKK 1,000.','Austria: No postage contribution.','Finland: Disclose value if gift over €10.']}],3:[{n:'Prize Draw',ic:'tg',d:'Classic loyalty mechanic — multiple purchase entries.',r:'low',mkt:{UK:'ok',IE:'watch',DE:'ok',FR:'ok',NL:'ok',BE:'high',DK:'watch',SE:'ok',NO:'ok',FI:'ok',CH:'ok',AT:'ok',ES:'high',IT:'high',PL:'high',AU:'watch',CA:'watch',US:'watch'},cons:['GDPR: Loyalty membership data is NOT marketing consent — separate opt-in required.','Belgium: Purchase-linked draw requires genuine skill element.','Ireland: Prize pool threshold — €2,500 without licence.','Denmark: SKAT registration. Tax 17.5%.','Finland: 30% lottery tax.','Norway: 28% prize tax.','Spain / Italy: Registration required.','Poland: Lottery licence required.','Canada: AMOE required.']},{n:'Gift with Purchase',ic:'gi',d:'Tiered loyalty gifts for repeat buyers.',r:'low',mkt:{UK:'ok',IE:'ok',DE:'watch',FR:'ok',NL:'ok',BE:'ok',DK:'watch',SE:'ok',NO:'ok',FI:'ok',CH:'ok',AT:'watch',ES:'ok',IT:'ok',PL:'ok',AU:'ok',CA:'ok',US:'ok'},cons:['Germany: Gift details essential.','Ireland: Gift details upfront.','Belgium: Gift delay permitted.','Denmark: Gift cap DKK 1,000.','Austria: No postage contribution.','Finland: Gifts over €10 — value must be disclosed.','GDPR: Loyalty data collection requires clear consent.']},{n:'Competition',ic:'tr',d:'High-engagement loyalty mechanic.',r:'mid',mkt:{UK:'ok',IE:'ok',DE:'ok',FR:'ok',NL:'ok',BE:'ok',DK:'ok',SE:'ok',NO:'ok',FI:'ok',CH:'ok',AT:'ok',ES:'high',IT:'high',PL:'ok',AU:'ok',CA:'watch',US:'ok'},cons:['Belgium: Genuine skill required.','Italy / Spain: Registration required.','Canada: Skill-testing question required.','GDPR: Data used must be kept to stated purpose.']},{n:'Instant Win',ic:'zp',d:'Surprise and delight for repeat purchasers.',r:'mid',mkt:{UK:'ok',IE:'watch',DE:'ok',FR:'ok',NL:'ok',BE:'high',DK:'watch',SE:'ok',NO:'ok',FI:'ok',CH:'ok',AT:'ok',ES:'high',IT:'high',PL:'high',AU:'watch',CA:'ok',US:'ok'},cons:['Belgium: Purchase-linked instant win not permitted without genuine skill element.','Ireland: Prize pool thresholds apply.','Denmark: SKAT registration.','Finland: 30% lottery tax.','Norway: 28% prize tax.','On-pack: 12–16 week compliance lead time.','Spain / Italy: Registration required.']}],4:[{n:'Gift with Purchase',ic:'gi',d:'Most effective retail activation mechanic.',r:'low',mkt:{UK:'ok',IE:'ok',DE:'watch',FR:'ok',NL:'ok',BE:'ok',DK:'watch',SE:'ok',NO:'ok',FI:'ok',CH:'ok',AT:'watch',ES:'ok',IT:'ok',PL:'ok',AU:'ok',CA:'ok',US:'ok'},cons:['On-pack: gift details must be disclosed at point of purchase (except Belgium).','Germany: Gift details essential.','Ireland: ASAI Code requires gift details upfront.','Belgium: Gift delay permitted.','Denmark: Gift cap DKK 1,000.','Austria: Postage contribution NOT permitted.','Finland: If gift over €10, value must be indicated.']},{n:'Instant Win',ic:'zp',d:'On-pack instant win — classic retail activation. 12–16 week compliance lead time required.',r:'mid',mkt:{UK:'ok',IE:'watch',DE:'ok',FR:'ok',NL:'ok',BE:'high',DK:'watch',SE:'ok',NO:'ok',FI:'ok',CH:'ok',AT:'ok',ES:'high',IT:'high',PL:'high',AU:'watch',CA:'ok',US:'ok'},cons:['On-pack mechanics: MINIMUM 12–16 week lead time from compliance brief to artwork approval.','Belgium: Purchase-linked requires genuine skill element.','Ireland: Prize pool thresholds apply.','Denmark: Register with SKAT.','Finland: 30% lottery tax.','Norway: 28% prize tax.','Spain / Italy: Registration required.']},{n:'Prize Draw',ic:'tg',d:'Drive retail sales with a prize draw on-pack or at till.',r:'low',mkt:{UK:'ok',IE:'watch',DE:'ok',FR:'ok',NL:'ok',BE:'high',DK:'watch',SE:'ok',NO:'ok',FI:'ok',CH:'ok',AT:'ok',ES:'high',IT:'high',PL:'high',AU:'watch',CA:'watch',US:'watch'},cons:['On-pack prize draw: allow 12–16 weeks from compliance brief to print sign-off.','Belgium: Purchase-linked draw requires genuine skill element.','Ireland: Prize pool threshold.','Denmark: Register with SKAT. Tax 17.5%.','Germany: No registration. T&Cs in German.','Spain / Italy / Poland: Registration required.']},{n:'Competition',ic:'tr',d:'On-pack or in-store skill-based competition. Belgium-safe.',r:'mid',mkt:{UK:'ok',IE:'ok',DE:'ok',FR:'ok',NL:'ok',BE:'ok',DK:'ok',SE:'ok',NO:'ok',FI:'ok',CH:'ok',AT:'ok',ES:'high',IT:'high',PL:'ok',AU:'ok',CA:'watch',US:'ok'},cons:['Belgium: Competition with genuine skill is the ONLY compliant purchase-linked mechanic.','Italy / Spain: Registration required.','On-pack: 12–16 week compliance lead time.','Germany: No registration. Judging criteria in T&Cs.','Australia: No permit required.','Canada: NPN required. Skill-testing question for winner.']}]};
+
+function gico(c){var i={tg:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',zp:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',gi:'<polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/>',tr:'<path d="M6 9H4.5a2.5 2.5 0 010-5H6"/><path d="M18 9h1.5a2.5 2.5 0 000-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0012 0V2z"/>'};return i[c]||i.tg;}
+function rlbl(r){var b='font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap;';if(r==='low')return '<span style="'+b+'background:#DCFCE7;color:#14532D;border:1px solid #86EFAC">Lower risk</span>';if(r==='mid')return '<span style="'+b+'background:#FEF3C7;color:#78350F;border:1px solid #FCD34D">Review needed</span>';return '<span style="'+b+'background:#FEE2E2;color:#7F1D1D;border:1px solid #FCA5A5">Complex</span>';}
+function bRG(m){if(!m.cons||!S.markets.length)return '';var PFX={UK:'UK:',IE:'Ireland:',DE:'Germany:',FR:'France:',NL:'Netherlands:',BE:'Belgium:',CH:'Switzerland:',AT:'Austria:',ES:'Spain:',IT:'Italy:',PL:'Poland:',SE:'Sweden:',NO:'Norway:',DK:'Denmark:',FI:'Finland:',US:'USA:',AU:'Australia:',CA:'Canada:'};function gm(t){for(var mk in PFX){if(t.indexOf(PFX[mk])===0)return mk;}return '_g';}var grps={ok:[],watch:[],high:[]},mg={ok:[],watch:[],high:[]},gen=[];S.markets.forEach(function(mk){var st=m.mkt&&m.mkt[mk]?m.mkt[mk]:'ok';if(mg[st])mg[st].push(mk);});m.cons.forEach(function(c){var mk=gm(c);if(mk==='_g'){gen.push(c);}else{var st=m.mkt&&m.mkt[mk]?m.mkt[mk]:null;if(st&&S.markets.includes(mk))grps[st].push({c:c,mk:mk});}});var h='';[{k:'ok',l:'Clean markets',d:'#16a34a'},{k:'watch',l:'Watch markets',d:'#d97706'},{k:'high',l:'Escalate',d:'#dc2626'}].forEach(function(cfg,gi){var mkts=mg[cfg.k]||[],items=grps[cfg.k]||[];if(gi===0&&gen.length&&mkts.length)items=items.concat(gen.map(function(c){return{c:c};}));if(!mkts.length&&!items.length)return;var badges=mkts.map(function(mk){return '<span class="rg-b '+cfg.k+'">'+(MKT[mk]?MKT[mk].f:'')+' '+mk+'</span>';}).join('');var body=items.map(function(it){return '<div class="rg-item"><div class="rg-id '+cfg.k+'"></div><div>'+it.c+'</div></div>';}).join('');if(!badges&&!body)return;h+='<div class="rg'+(gi===2?' open':'')+'"><div class="rg-h '+cfg.k+'" onclick="this.parentNode.classList.toggle(\'open\')">'+'<div class="rg-d" style="background:'+cfg.d+'"></div><div class="rg-t '+cfg.k+'">'+cfg.l+'</div><div class="rg-bs">'+badges+'</div><div class="rg-cv">▼</div></div>'+(body?'<div class="rg-body">'+body+'</div>':'')+'</div>';});return h;}
+function goTo(n){var prev=document.querySelector('.scr.active');if(prev)prev.classList.remove('active');var next=document.getElementById('s'+n);if(next)next.classList.add('active');S.cur=n;updUI();updSB();updEy();if(n===6)setTimeout(bMechs,60);if(n===7)setTimeout(bBrief,60);if(n===8)setTimeout(bDash,60);}
+function goNext(){var i=FLOW.indexOf(S.cur);if(i<0||i>=FLOW.length-1)return;var nx=FLOW[i+1];if(nx===6){var ov=document.createElement('div');ov.style.cssText='position:absolute;inset:0;background:rgba(255,255,255,.96);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px';var sp=document.createElement('div');sp.style.cssText='width:34px;height:34px;border-radius:50%;border:3px solid #EDE4F7;border-top-color:#5B1D82;animation:spin .75s linear infinite';var tx=document.createElement('div');tx.style.cssText='font-size:13px;font-weight:600;color:#1A0533';tx.textContent='Analysing your inputs...';ov.appendChild(sp);ov.appendChild(tx);document.getElementById('screens').appendChild(ov);setTimeout(function(){ov.remove();goTo(6);},1400);}else goTo(nx);}
+function goBack(){var i=FLOW.indexOf(S.cur);if(i>0)goTo(FLOW[i-1]);}
+function goHome(){S={cur:0,campaign:'',nar:'brand',sector:'',outcomes:[],primary:-1,idea:'',markets:['UK'],dismissed:[]};var ci=document.getElementById('campInp');if(ci)ci.value='';var ii=document.getElementById('ideaInp');if(ii)ii.value='';document.querySelectorAll('.oc.sel,.oc.pri').forEach(function(c){c.classList.remove('sel','pri');});document.querySelectorAll('.mc.on').forEach(function(c){c.classList.remove('on');});var uk=document.querySelector('.mc[data-mkt="UK"]');if(uk)uk.classList.add('on');document.getElementById('nrB').classList.remove('sel');document.getElementById('nrA').classList.remove('sel');var sec=document.getElementById('secInl');if(sec){sec.style.maxHeight='0';sec.style.opacity='0';}var gp=document.getElementById('gcPanel');if(gp)gp.style.display='none';goTo(0);}
+function sbGo(n){var fi=FLOW.indexOf(S.cur),ti=FLOW.indexOf(n);if(ti<=fi)goTo(n);}
+function updUI(){var i=FLOW.indexOf(S.cur);var pb=document.getElementById('pf');if(pb)pb.style.width=Math.round((i/(FLOW.length-1))*100)+'%';var dc=document.getElementById('dCtx'),db=document.getElementById('dBtns');if(!dc||!db)return;var sv='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';var ctx='',btns='';if(S.cur===0){ctx='PromoVeritas Compliance Stress-Test';btns='<button class="btn-go" onclick="goNext()">Continue '+sv+'</button>';}else if(S.cur===9){ctx=S.campaign?'<strong>'+S.campaign+'</strong> — complete':'Stress-test complete';btns='<button class="btn-re" onclick="goHome()">Start again</button>';}else{if(S.campaign)ctx='<strong>'+S.campaign+'</strong>';if(S.markets.length>0&&S.cur>5)ctx+=(ctx?' · ':'')+S.markets.slice(0,3).join(', ')+(S.markets.length>3?' +'+(S.markets.length-3):'');var lbl=S.cur===5?'Analyse':S.cur===6?'View Brief':'Continue';btns=(i>0?'<button class="btn-bk" onclick="goBack()">Back</button>':'')+'<button class="btn-go" onclick="goNext()">'+lbl+' '+sv+'</button>';}dc.innerHTML=ctx;db.innerHTML=btns;}
+function updSB(){var fi=FLOW.indexOf(S.cur);document.querySelectorAll('.ni').forEach(function(el){var sc=parseInt(el.getAttribute('data-s')),si=FLOW.indexOf(sc);el.classList.remove('active','done');if(sc===S.cur)el.classList.add('active');else if(si>=0&&si<fi)el.classList.add('done');});var n0=document.getElementById('ns0');if(n0)n0.textContent=S.campaign||'Name your campaign';var n5=document.getElementById('ns5');if(n5)n5.textContent=S.markets.length>1?S.markets.length+' markets selected':S.markets[0]||'Select countries';}
+function updEy(){[3,4,5,6,7,8,9].forEach(function(n){var el=document.getElementById('ey'+n);if(!el)return;if(S.campaign){el.textContent=S.campaign;el.style.display='inline';}else el.style.display='none';});}
+function selNar(v,btn){S.nar=v;document.getElementById('nrB').classList.toggle('sel',v==='brand');document.getElementById('nrA').classList.toggle('sel',v==='agency');var sec=document.getElementById('secInl');if(v==='agency'){sec.style.maxHeight='500px';sec.style.opacity='1';}else{sec.style.maxHeight='0';sec.style.opacity='0';S.sector='';document.querySelectorAll('#secG .oc').forEach(function(c){c.classList.remove('sel');});}updUI();}
+function selSec(v,btn){S.sector=v;document.querySelectorAll('#secG .oc').forEach(function(c){c.classList.remove('sel');});btn.classList.add('sel');}
+function loadR(name,sec,mkts,goalIdx){var ci=document.getElementById('campInp');if(ci)ci.value=name;S.campaign=name;S.sector=sec;S.markets=mkts.split(',');S.outcomes=[goalIdx];S.primary=goalIdx;var gbs=document.querySelectorAll('#goalG .oc');if(gbs[goalIdx]){gbs[goalIdx].classList.add('sel','pri');var t=document.getElementById('gt'+goalIdx);if(t)t.textContent='Primary';}showToast('Campaign loaded');updUI();updSB();}
+function selGoal(idx,btn){var was=btn.classList.contains('sel');if(!was){btn.classList.add('sel');S.outcomes.push(idx);if(S.primary<0){S.primary=idx;btn.classList.add('pri');var t=document.getElementById('gt'+idx);if(t)t.textContent='Primary';}else{var t2=document.getElementById('gt'+idx);if(t2)t2.textContent='Secondary';}}else{btn.classList.remove('sel','pri');S.outcomes=S.outcomes.filter(function(o){return o!==idx;});if(S.primary===idx){S.primary=S.outcomes.length?S.outcomes[0]:-1;if(S.primary>=0){var pb2=document.querySelectorAll('#goalG .oc')[S.primary];if(pb2){pb2.classList.add('pri');var pt=document.getElementById('gt'+S.primary);if(pt)pt.textContent='Primary';}}}}var panel=document.getElementById('gcPanel'),pri=S.primary>=0?S.primary:(S.outcomes.length?S.outcomes[0]:-1);if(panel&&pri>=0&&OUT[pri]){var o=OUT[pri];panel.style.display='block';document.getElementById('gcL').textContent=S.primary===pri?'Primary goal':'Secondary goal';document.getElementById('gcT').textContent=o.l;document.getElementById('gcD').textContent=o.d;document.getElementById('gcM').innerHTML=o.m.map(function(x){return '<span class="gcp">'+x+'</span>';}).join('');}else if(panel)panel.style.display='none';updUI();}
+function updWC(){var w=document.getElementById('ideaInp').value.trim().split(/\s+/).filter(Boolean).length;var el=document.getElementById('wc');if(el){el.textContent=w+' '+(w===1?'word':'words');el.style.color=w<10?'#D97706':w<25?'#7C6A92':'#166534';}}
+function insTopic(btn,text){var ta=document.getElementById('ideaInp');if(!ta)return;btn.classList.add('used');ta.value=ta.value+(ta.value.length&&!ta.value.endsWith(' ')?' ':'')+text;S.idea=ta.value;ta.focus();updWC();}
+function setEx(btn){var ta=document.getElementById('ideaInp');if(ta){ta.value=btn.getAttribute('data-i');S.idea=ta.value;updWC();}}
+function togM(btn,code){
+  var isOn=btn.classList.contains('on');
+  if(isOn){
+    if(S.markets.length===1)return;
+    btn.classList.remove('on');
+    S.markets=S.markets.filter(function(m){return m!==code;});
+  } else {
+    btn.classList.add('on');
+    if(!S.markets.includes(code))S.markets.push(code);
+  }
+  updDial();updMktPv();updUI();updSB();
+}
+function selReg(codes){
+  var allOn=codes.every(function(c){return S.markets.includes(c);});
+  codes.forEach(function(code){
+    var btn=document.querySelector('.mc[data-mkt="'+code+'"]');
+    if(allOn){
+      if(S.markets.length===1&&code===S.markets[0])return;
+      S.markets=S.markets.filter(function(m){return m!==code;});
+      if(btn)btn.classList.remove('on');
+    } else {
+      if(!S.markets.includes(code))S.markets.push(code);
+      if(btn)btn.classList.add('on');
+    }
+  });
+  if(!S.markets.length){
+    S.markets=['UK'];
+    var uk=document.querySelector('.mc[data-mkt="UK"]');
+    if(uk)uk.classList.add('on');
+  }
+  updDial();updMktPv();updUI();updSB();
+}
+var DS=[{l:'Simple',s:'Single market.',c:'#166534'},{l:'Simple',s:'Single market.',c:'#166534'},{l:'Lower',s:'2 markets — manageable with one compliance review.',c:'#166534'},{l:'Moderate',s:'3 markets — localised T&Cs apply.',c:'#92400E'},{l:'Moderate',s:'4 markets — budget for T&Cs localisation.',c:'#92400E'},{l:'Elevated',s:'5 markets — registration requirements likely.',c:'#92400E'},{l:'Elevated',s:'6 markets — multiple registration processes.',c:'#D97706'},{l:'High',s:'7 markets — dedicated PV project management recommended.',c:'#991B1B'},{l:'High',s:'8 markets — allow 12+ weeks minimum.',c:'#991B1B'},{l:'Very high',s:'9+ markets — significant multi-market programme.',c:'#991B1B'}];
+function updDial(){var n=S.markets.length,arc=document.getElementById('dArc'),cnt=document.getElementById('dN'),lbl=document.getElementById('dL'),sub=document.getElementById('dS');if(!arc)return;var st=DS[Math.min(n,DS.length-1)];arc.style.strokeDashoffset=239*(1-Math.min(1,n/10));arc.style.stroke=st.c;if(cnt){cnt.textContent=n;cnt.style.color=st.c;}if(lbl){lbl.textContent=st.l;lbl.style.color=st.c;}if(sub)sub.textContent=st.s;}
+function updMktPv(){var p=document.getElementById('mktPv');if(!p)return;var flags=[];if(S.markets.includes('BE'))flags.push('Belgium requires a skill element for games of chance');if(S.markets.includes('IE'))flags.push('Ireland caps prize pools at €2,500 without a lottery licence');if(S.markets.includes('DE'))flags.push('Germany requires T&Cs in German');if(['DK','SE','FI'].some(function(m){return S.markets.includes(m);}))flags.push('Scandinavia: odds of winning must be disclosed');if(['ES','IT','PL'].some(function(m){return S.markets.includes(m);}))flags.push('Spain, Italy, Poland require registration for promotional mechanics');p.innerHTML=flags.length?'<div class="mkt-pv"><div style="font-size:9px;font-weight:700;color:#7C3ABE;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px">Key compliance flags</div>'+flags.map(function(f){return '<div style="display:flex;gap:7px;font-size:11px;color:#4A3560;padding:3px 0;line-height:1.5"><div style="width:4px;height:4px;border-radius:50%;background:#5B1D82;flex-shrink:0;margin-top:6px"></div><div>'+f+'</div></div>';}).join('')+'</div>':'';}
+function bMechs(){var oi=S.primary>=0?S.primary:(S.outcomes[0]||0);var mechs=(MECHS[oi]||MECHS[0]).filter(function(m){return !S.dismissed.includes(m.n);});var mc=document.getElementById('mCnt');if(mc)mc.textContent=mechs.length;var md=document.getElementById('mDesc');if(md&&S.primary>=0)md.innerHTML='for: <strong>'+OUT[S.primary].l+'</strong>';var pb=document.getElementById('pvBar');if(pb&&S.primary>=0){pb.innerHTML='<strong>PromoVeritas is looking at:</strong> A campaign to '+OUT[S.primary].l.toLowerCase()+', running across '+S.markets.slice(0,3).join(', ')+(S.markets.length>3?' and '+(S.markets.length-3)+' more':'')+'.';pb.style.display='block';}var cont=document.getElementById('mCards');if(!cont)return;cont.innerHTML=mechs.map(function(m,i){var rbc=m.r==='low'?'rbl':m.r==='mid'?'rbm':'rbh';var dots=S.markets.map(function(mk){if(!m.mkt||!m.mkt[mk])return '';var st=m.mkt[mk];var col=st==='ok'?'#16a34a':st==='watch'?'#d97706':'#dc2626';return '<span style="width:5px;height:5px;border-radius:50%;background:'+col+';display:inline-block;margin-right:2px"></span>';}).filter(Boolean).join('');return '<div class="mcard '+rbc+'" id="mc'+i+'"><div class="mcard-top" onclick="togMC('+i+')">'+'<div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">'+gico(m.ic)+'</svg></div>'+'<div class="mini"><div class="mna">'+m.n+'</div><div class="mde">'+m.d+'</div>'+(dots?'<div style="margin-top:4px">'+dots+'</div>':'')+'</div>'+'<div class="mri">'+rlbl(m.r)+'<button class="mdis" onclick="event.stopPropagation();disMC('+i+')">✕</button><div class="mchev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div></div>'+'</div>'+'<div class="mcard-body"><div style="padding-top:12px">'+bRG(m)+'</div><div class="mnote">Guidance only — not legal advice. PromoVeritas expertise should be engaged before any campaign proceeds.</div></div></div>';}).join('');bTTC(mechs);var cr=document.getElementById('mCrow');if(cr)cr.style.display='flex';}
+function togMC(i){var c=document.getElementById('mc'+i);if(c)c.classList.toggle('open');}
+function disMC(i){var oi=S.primary>=0?S.primary:0;var mechs=(MECHS[oi]||MECHS[0]).filter(function(m){return !S.dismissed.includes(m.n);});if(mechs[i])S.dismissed.push(mechs[i].n);bMechs();}
+function bTTC(mechs){var w=document.getElementById('ttcW');if(!w)return;var pts=[];if(S.markets.includes('BE'))pts.push('<strong>Belgium:</strong> Games of chance require a genuine skill element. Prize Draw and Instant Win mechanics must be restructured as a Competition for Belgium.');if(S.markets.includes('IE'))pts.push('<strong>Ireland:</strong> Purchase-linked prize pools are capped at €2,500 without a lottery licence. Applications must be made at least 60 days before the promotion starts.');if(S.markets.includes('DE'))pts.push('<strong>Germany:</strong> T&Cs and all marketing communications must be drafted in German.');if(['DK','SE','FI'].some(function(m){return S.markets.includes(m);}))pts.push('<strong>Scandinavia:</strong> Denmark requires SKAT registration — allow 5 working days. Odds of winning must be disclosed.');if(S.markets.length>2)pts.push('<strong>Multi-market T&Cs:</strong> Running the same T&Cs across '+S.markets.length+' markets carries significant legal risk. Each market version requires localisation.');pts.push('<strong>Timeline:</strong> Allow at least '+Math.max(8,S.markets.length*2)+' weeks from compliance brief to launch.');w.innerHTML=pts.length?'<div class="ttc"><div class="ttc-h"><div class="ttc-i"><svg viewBox="0 0 24 24" fill="none" stroke="#5B1D82" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="ttc-t">Things to consider</div></div>'+pts.map(function(p){return '<div class="ttc-item"><div class="ttc-dot"></div><div>'+p+'</div></div>';}).join('')+'</div>':'';}
+function bBrief(){var oi=S.primary>=0?S.primary:0;var mechs=(MECHS[oi]||MECHS[0]).filter(function(m){return !S.dismissed.includes(m.n);});var goals=S.outcomes.map(function(i){return OUT[i]?OUT[i].l:'';}).filter(Boolean);var now=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});var bsG=document.getElementById('bsG');var bsM=document.getElementById('bsM');var bsMc=document.getElementById('bsMc');if(bsG)bsG.textContent=goals.length;if(bsM)bsM.textContent=S.markets.length;if(bsMc)bsMc.textContent=mechs.length;var bc=document.getElementById('bCamp');if(bc)bc.textContent=S.campaign||'Untitled';var bd=document.getElementById('bDate');if(bd)bd.textContent=now;var bg=document.getElementById('bGoal');if(bg)bg.textContent=S.primary>=0?OUT[S.primary].l:goals.join(', ')||'—';var bm=document.getElementById('bMkts');if(bm)bm.textContent=S.markets.join(', ');var hi=mechs.filter(function(m){return m.r==='high';}).length,mi=mechs.filter(function(m){return m.r==='mid';}).length;var rw=document.getElementById('rGW');if(rw){var sc2=(hi*2+mi)/(mechs.length*2||1);var rl2,rc,off;if(sc2>=0.6){rl2='Complex';rc='#991B1B';off=25;}else if(sc2>=0.3){rl2='Review needed';rc='#92400E';off=55;}else{rl2='Lower risk';rc='#166534';off=85;}rw.innerHTML='<div class="rgg"><div style="position:relative;flex-shrink:0"><svg width="70" height="70" viewBox="0 0 80 80"><path d="M10,55 A30,30 0 1,1 70,55" fill="none" stroke="#EDE4F7" stroke-width="7" stroke-linecap="round"/><path d="M10,55 A30,30 0 1,1 70,55" fill="none" stroke="'+rc+'" stroke-width="7" stroke-linecap="round" stroke-dasharray="140" stroke-dashoffset="'+(140*off/100)+'"/></svg><div style="position:absolute;bottom:5px;left:0;right:0;text-align:center;font-size:8px;font-weight:700;color:'+rc+';text-transform:uppercase">'+rl2+'</div></div><div><div style="font-size:.95rem;font-weight:800;color:'+rc+';margin-bottom:3px">'+rl2+'</div><div style="font-size:11px;color:#7C6A92;line-height:1.5">'+mechs.length+' mechanic'+(mechs.length!==1?'s':'')+' across '+S.markets.length+' market'+(S.markets.length!==1?'s':'')+'. '+(hi>0?hi+' require detailed review.':mi>0?'Some require country-level review.':'Standard compliance process applies.')+'</div></div></div>';}var ov=document.getElementById('bOv');var s2=S.sector?' in the '+S.sector+' sector':'';if(ov)ov.innerHTML='<div class="bsecl">Campaign overview</div><div style="font-size:12px;color:#4A3560;line-height:1.65">'+(S.campaign||'This campaign')+s2+' is targeting '+(goals[0]||'campaign goals')+' across '+S.markets.length+' market'+(S.markets.length!==1?'s':'')+' ('+S.markets.join(', ')+').'+'The primary mechanic'+(mechs.length!==1?'s':'')+' to explore: <strong>'+mechs.map(function(m){return m.n;}).join(', ')+'</strong>.'+(S.idea?'<br><br>Brief: "'+S.idea.slice(0,150)+(S.idea.length>150?'…':'')+'"':'')+'</div>';var rc2=hi>0?'#7F1D1D':mi>0?'#78350F':'#14532D';var rb2=hi>0?'#FEE2E2':mi>0?'#FEF3C7':'#DCFCE7';var rbs=hi>0?'#FCA5A5':mi>0?'#FCD34D':'#86EFAC';var rs=document.getElementById('bRk');if(rs)rs.innerHTML='<div class="bsecl">Risk assessment</div><div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;padding:10px 12px;background:'+rb2+';border-radius:8px;border:1px solid '+rbs+'"><div style="font-size:1rem;font-weight:800;color:'+rc2+'">'+(hi>0?'High complexity':mi>0?'Review needed':'Lower risk')+'</div><div style="font-size:11px;color:'+rc2+';text-align:right">'+mechs.length+' mechanic'+(mechs.length!==1?'s':'')+'<br>'+S.markets.length+' market'+(S.markets.length!==1?'s':'')+'</div></div>'+mechs.map(function(m){return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #EDE4F7;font-size:12px"><span style="flex:1;font-weight:500;color:#4A3560">'+m.n+'</span>'+rlbl(m.r)+'</div>';}).join('');var wk=Math.max(8,S.markets.length*2);var ne=document.getElementById('bNx');if(ne)ne.innerHTML='<div class="bsecl">Recommended next step</div><div style="font-size:12px;color:#4A3560;line-height:1.65">Share this Smart Brief with PromoVeritas to begin a full Stage 1 compliance review. For a campaign of this scope — '+S.markets.length+' market'+(S.markets.length!==1?'s':'')+', '+mechs.length+' mechanic'+(mechs.length!==1?'s':'')+' — allow at least <strong>'+wk+' weeks</strong> from compliance brief to launch.</div>';}
+function bDash(){var oi=S.primary>=0?S.primary:0;var mechs=(MECHS[oi]||MECHS[0]).filter(function(m){return !S.dismissed.includes(m.n);});var wk=Math.max(8,S.markets.length*2);var w=document.getElementById('dashC');if(!w)return;var steps=[{l:'Smart Brief',w:'Now'},{l:'Stage 1 review',w:'Week 1–2'},{l:'T&Cs drafting',w:'Week 2–4'},{l:'Registrations',w:'Week 4–'+Math.round(wk*.8)},{l:'Launch',w:'Week '+wk}];w.innerHTML='<div class="dg"><div class="dc"><div class="dv">'+mechs.length+'</div><div class="dl">mechanics to review</div></div><div class="dc"><div class="dv">'+S.markets.length+'</div><div class="dl">markets in scope</div></div><div class="dc"><div class="dv">'+wk+'w</div><div class="dl">recommended lead time</div></div></div><div class="dsec"><div class="dsl">Mechanics overview</div>'+mechs.map(function(m){return '<div class="dmr"><div class="dmi"><svg viewBox="0 0 24 24" fill="none" stroke="#5B1D82" stroke-width="1.5">'+gico(m.ic)+'</svg></div><div class="dmn">'+m.n+'</div><div style="margin-left:auto">'+rlbl(m.r)+'</div></div>';}).join('')+'</div><div class="dsec"><div class="dsl">Compliance timeline</div><div class="stpr">'+steps.map(function(s,i){var cls=i===0?'dn':i===1?'cr':'';return '<div class="stp '+cls+'"><div class="stpd"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div class="stpl">'+s.l+'<br><span class="stpw">'+s.w+'</span></div></div>';}).join('')+'</div></div>';}
+function doPV(){window.open('mailto:compliance@promoveritas.com?subject='+encodeURIComponent('Smart Brief: '+(S.campaign||'Untitled')),'_blank');showToast('Opening email to PromoVeritas');}
+function dlBrief(){var oi=S.primary>=0?S.primary:0;var mechs=(MECHS[oi]||MECHS[0]).filter(function(m){return !S.dismissed.includes(m.n);});var goals=S.outcomes.map(function(i){return OUT[i]?OUT[i].l:'';}).filter(Boolean);var txt='PromoVeritas Smart Brief\n'+'='.repeat(40)+'\n\nCampaign: '+(S.campaign||'Untitled')+'\nDate: '+new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})+'\nSector: '+(S.sector||'N/A')+'\nMarkets: '+S.markets.join(', ')+'\nGoals: '+goals.join(', ')+'\nMechanics: '+mechs.map(function(m){return m.n;}).join(', ')+'\n\nBrief:\n'+(S.idea||'Not provided')+'\n\n'+'='.repeat(40)+'\nGuidance only — not legal advice.\nwww.promoveritas.com';var blob=new Blob([txt],{type:'text/plain'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(S.campaign||'smart-brief').replace(/\s+/g,'-').toLowerCase()+'-pv-brief.txt';a.click();showToast('Brief downloaded');}
+function showToast(msg){var t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}
+function togLP(){document.getElementById('lpan').classList.toggle('open');}
+document.addEventListener('click',function(e){var lp=document.getElementById('lpan'),lb=document.querySelector('.live');if(lp&&lp.classList.contains('open')&&!lp.contains(e.target)&&lb&&!lb.contains(e.target))lp.classList.remove('open');});
+
+setTimeout(function(){
+  var s=document.getElementById('splash');
+  if(!s)return;
+  s.style.transition='opacity .6s ease';
+  s.style.opacity='0';
+  setTimeout(function(){s.remove();},650);
+},2200);
+
+updUI();updSB();updDial();
+</script>
+</body>
+</html>
